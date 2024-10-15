@@ -1,0 +1,13 @@
+.image-container {
+  display: flex;
+  overflow: hidden;
+}
+.image-container img {
+  max-width: 100%; 
+  height: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  border-radius: 15px; 
+}
+
+
+
