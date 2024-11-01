@@ -6,7 +6,7 @@ distributed to other students.
 Name: Rickson Bozar
 Student ID: 167549237
 Date: 2024-10-14
-Vercel Web App URL:
+Vercel Web App URL: https://web322-ejouxka4r-rickson-bozars-projects.vercel.app/
 GitHub Repository URL: https://github.com/Rickson0628/web322-app.git
 ********************************************************************************/
 
