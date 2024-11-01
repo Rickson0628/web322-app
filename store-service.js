@@ -45,9 +45,61 @@ function getCategories() {
     });
 }
 
+function addItem(itemData) {
+    return new Promise((resolve, reject) => {
+        itemData.published = itemData.published !== undefined;
+        itemData.id = items.length + 1;
+        items.push(itemData);
+
+        fs.writeFile('./data/items.json', JSON.stringify(items, null, 2), 'utf8')
+            .then(() => resolve(itemData))
+            .catch((err) => reject("Failed to save item: " + err));
+    });
+}
+
+function getItemsByCategory(category) {
+    return new Promise((resolve, reject) => {
+        const filteredItems = items.filter(item => item.category === parseInt(category));
+        if (filteredItems.length > 0) {
+            resolve(filteredItems);
+        } else {
+            reject("No results returned");
+        }
+    });
+}
+
+
+function getItemsByMinDate(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const minDate = new Date(minDateStr);
+        const filteredItems = items.filter(item => new Date(item.postDate) >= minDate);
+        if (filteredItems.length > 0) {
+            resolve(filteredItems);
+        } else {
+            reject("No results returned");
+        }
+    });
+}
+
+
+function getItemById(id) {
+    return new Promise((resolve, reject) => {
+        const item = items.find(item => item.id === parseInt(id));
+        if (item) {
+            resolve(item);
+        } else {
+            reject("No result returned");
+        }
+    });
+}
+
 module.exports = {
     initialize,
     getAllItems,
     getPublishedItems,
-    getCategories
+    getCategories,
+    addItem,
+    getItemsByCategory,
+    getItemsByMinDate,
+    getItemById
 };
