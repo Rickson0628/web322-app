@@ -1,69 +1,116 @@
-const fs = require('fs').promises;
+const fs = require('fs');
+const path = require('path');
+
 let items = [];
 let categories = [];
 
-async function initialize() {
-    try {
-        const itemsData = await fs.readFile('./data/items.json', 'utf8');
-        items = JSON.parse(itemsData);
-        
-        const categoriesData = await fs.readFile('./data/categories.json', 'utf8');
-        categories = JSON.parse(categoriesData);
-    } catch (error) {
-        throw new Error('Unable to read file');
-    }
-}
-
-function getAllItems() {
+function initialize() {
     return new Promise((resolve, reject) => {
-        if (items.length === 0) {
-            reject('No results returned');
-        } else {
-            resolve(items);
-        }
+       
+        fs.readFile(path.join(__dirname, 'data', 'items.json'), 'utf8', (err, data) => {
+            if (err) {
+                reject('Unable to read items.json file');
+                return;
+            }
+
+            items = JSON.parse(data);
+
+           
+            fs.readFile(path.join(__dirname, 'data', 'categories.json'), 'utf8', (err, data) => {
+                if (err) {
+                    reject('Unable to read categories.json file');
+                    return;
+                }
+
+                categories = JSON.parse(data);
+                resolve(); 
+            });
+        });
     });
 }
 
 function getPublishedItems() {
     return new Promise((resolve, reject) => {
-        const publishedItems = items.filter(item => item.published);
-        if (publishedItems.length === 0) {
-            reject('No results returned');
-        } else {
+        const publishedItems = items.filter(item => item.published === true);
+        if (publishedItems.length > 0) {
             resolve(publishedItems);
+        } else {
+            reject('No published items found');
         }
     });
 }
 
-function getCategories() {
+
+function getPublishedItemsByCategory(category) {
     return new Promise((resolve, reject) => {
-        if (categories.length === 0) {
-            reject('No results returned');
+        const filteredItems = items.filter(item => item.published === true && item.category === parseInt(category, 10));
+        if (filteredItems.length > 0) {
+            resolve(filteredItems);
         } else {
-            resolve(categories);
+            reject(`No published items found for category ${category}`);
         }
     });
 }
+
+
+function getAllItems() {
+    return new Promise((resolve, reject) => {
+        if (items.length > 0) {
+            resolve(items);
+        } else {
+            reject('No items found');
+        }
+    });
+}
+
+
+function getAllCategories() {
+    return new Promise((resolve, reject) => {
+        if (categories.length > 0) {
+            resolve(categories);
+        } else {
+            reject('No categories found');
+        }
+    });
+}
+
 
 function addItem(itemData) {
     return new Promise((resolve, reject) => {
-        itemData.published = itemData.published !== undefined;
-        itemData.id = items.length + 1;
-        items.push(itemData);
+        try {
+   
+            itemData.published = itemData.published ? true : false;
 
-        fs.writeFile('./data/items.json', JSON.stringify(items, null, 2), 'utf8')
-            .then(() => resolve(itemData))
-            .catch((err) => reject("Failed to save item: " + err));
+            itemData.id = items.length + 1;
+
+          
+            const currentDate = new Date();
+            itemData.itemDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+            
+            items.push(itemData);
+
+          
+            fs.writeFile(path.join(__dirname, 'data', 'items.json'), JSON.stringify(items, null, 2), 'utf8', err => {
+                if (err) {
+                    reject('Error writing to items.json file');
+                } else {
+                    resolve(itemData); 
+                }
+            });
+        } catch (err) {
+            reject('Error adding item: ' + err.message);
+        }
     });
 }
 
 function getItemsByCategory(category) {
     return new Promise((resolve, reject) => {
-        const filteredItems = items.filter(item => item.category === parseInt(category));
+        const filteredItems = items.filter(item => item.category === parseInt(category, 10));
         if (filteredItems.length > 0) {
             resolve(filteredItems);
         } else {
-            reject("No results returned");
+            reject(`No items found for category ${category}`);
         }
     });
 }
@@ -76,7 +123,7 @@ function getItemsByMinDate(minDateStr) {
         if (filteredItems.length > 0) {
             resolve(filteredItems);
         } else {
-            reject("No results returned");
+            reject(`No items found with post date on or after ${minDateStr}`);
         }
     });
 }
@@ -84,20 +131,22 @@ function getItemsByMinDate(minDateStr) {
 
 function getItemById(id) {
     return new Promise((resolve, reject) => {
-        const item = items.find(item => item.id === parseInt(id));
+        const item = items.find(item => item.id === parseInt(id, 10));
         if (item) {
             resolve(item);
         } else {
-            reject("No result returned");
+            reject(`No item found with ID ${id}`);
         }
     });
 }
 
+
 module.exports = {
     initialize,
-    getAllItems,
     getPublishedItems,
-    getCategories,
+    getPublishedItemsByCategory,
+    getAllItems,
+    getAllCategories,
     addItem,
     getItemsByCategory,
     getItemsByMinDate,
