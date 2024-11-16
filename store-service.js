@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
+// empty arrays
 let items = [];
 let categories = [];
 
