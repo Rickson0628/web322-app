@@ -1,7 +1,7 @@
-
 <div class="row">
   <div class="col-md-12">
     <h2>Categories</h2>
+    <a href="/categories/add" class="btn btn-success pull-right">Add Category</a> <!-- Add Category button -->
     <hr />
     <div class="table-responsive">
       <table class="table">
@@ -9,19 +9,24 @@
           <tr>
             <th>Category ID</th>
             <th>Category Name</th>
+            <th></th> <!-- Empty header for the remove button column -->
           </tr>
         </thead>
         <tbody>
           {{#each categories}}
-          <tr>
-            <td><a href="/items?category={{this.id}}">{{this.id}}</a></td>
-            <td><a href="/items?category={{this.id}}">{{this.category}}</a></td>
-          </tr>
+            <tr>
+              <td><a href="/items?category={{this.id}}">{{this.id}}</a></td>
+              <td><a href="/items?category={{this.id}}">{{this.category}}</a></td>
+              <td>
+                <!-- Remove Button -->
+                <a href="/categories/delete/{{this.id}}" class="btn btn-danger">Remove</a>
+              </td>
+            </tr>
           {{/each}}
           {{#unless categories}}
-          <tr>
-            <td colspan="2" class="text-center"><strong>{{message}}</strong></td>
-          </tr>
+            <tr>
+              <td colspan="3" class="text-center"><strong>{{message}}</strong></td>
+            </tr>
           {{/unless}}
         </tbody>
       </table>

@@ -1,8 +1,8 @@
-
 <div class="container">
   <div class="row">
     <div class="col-md-12">
       <h2>Items</h2>
+      <a href="/Items/add" class="btn btn-success pull-right">Add Item</a> <!-- Add Item button -->
       <hr />
     </div>
   </div>
@@ -19,6 +19,7 @@
               <th>Price</th>
               <th>Category</th>
               <th>Published</th>
+              <th></th> <!-- New header for the 'Remove' button column -->
             </tr>
           </thead>
           <tbody>
@@ -32,6 +33,9 @@
                   <a href="/items?category={{category}}">{{category}}</a>
                 </td>
                 <td>{{#if published}}Yes{{else}}No{{/if}}</td>
+                <td>
+                  <a href="/item/delete/{{id}}" class="btn btn-danger">Remove</a> <!-- Remove button -->
+                </td>
               </tr>
             {{/each}}
           </tbody>

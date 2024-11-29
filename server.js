@@ -1,5 +1,5 @@
 /*********************************************************************************
-WEB322 – Assignment 04
+WEB322 – Assignment 05
 I declare that this assignment is my own work in accordance with Seneca Academic Policy.
 No part of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or
 distributed to other students.
@@ -19,6 +19,7 @@ const stripJs = require('strip-js');
 
 const app = express();
 const exphbs = require('express-handlebars');
+app.use(express.urlencoded({ extended: true }));
 
 
 app.engine('.hbs', exphbs.engine({
@@ -37,9 +38,16 @@ app.engine('.hbs', exphbs.engine({
         },
         safeHTML: function(context) {  
             return stripJs(context);    
+        },
+        formatDate: function(dateObj) {
+            let year = dateObj.getFullYear();
+            let month = (dateObj.getMonth() + 1).toString();
+            let day = dateObj.getDate().toString();
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2,'0')}`;
         }
     }
 }));
+
 app.set('view engine', '.hbs');
 
 cloudinary.config({
@@ -144,7 +152,7 @@ app.get('/items', (req, res) => {
                     res.render("items", { message: "no results" });
                 }
             })
-            .catch((err) => res.render("items", { message: "no results" }));
+            .catch((err) => res.render("items", { message: "Error fetching items" }));
     } else if (minDate) {
         storeService.getItemsByMinDate(minDate)
             .then((data) => {
@@ -154,7 +162,7 @@ app.get('/items', (req, res) => {
                     res.render("items", { message: "no results" });
                 }
             })
-            .catch((err) => res.render("items", { message: "no results" }));
+            .catch((err) => res.render("items", { message: "Error fetching items" }));
     } else {
         storeService.getAllItems()
             .then((data) => {
@@ -164,15 +172,8 @@ app.get('/items', (req, res) => {
                     res.render("items", { message: "no results" });
                 }
             })
-            .catch((err) => res.render("items", { message: "no results" }));
+            .catch((err) => res.render("items", { message: "Error fetching items" }));
     }
-});
-
-
-app.get('/item/:value', (req, res) => {
-    storeService.getItemById(req.params.value)
-        .then((item) => res.json(item))
-        .catch((err) => res.status(500).json({ message: err }));
 });
 
 
@@ -185,11 +186,58 @@ app.get('/categories', (req, res) => {
                 res.render("categories", { message: "no results" });
             }
         })
-        .catch((err) => res.render("categories", { message: "no results" }));
+        .catch((err) => res.render("categories", { message: "Error fetching categories" }));
+});
+
+app.get('/item/:value', (req, res) => {
+    storeService.getItemById(req.params.value)
+        .then((item) => res.json(item))
+        .catch((err) => res.status(500).json({ message: err }));
+});
+
+app.get('/categories/add', (req, res) => {
+    res.render('addCategories', { title: 'Add Category' });
+});
+app.post('/categories/add', (req, res) => {
+    storeService.addCategory(req.body)
+        .then(() => res.redirect('/categories'))
+        .catch((err) => {
+            console.error('Failed to add category:', err);
+            res.status(500).send('Failed to add category');
+        });
+});
+app.get('/categories/delete/:id', (req, res) => {
+    storeService.deleteCategoryById(req.params.id)
+        .then(() => res.redirect('/categories'))
+        .catch((err) => {
+            console.error('Unable to remove category:', err);
+            res.status(500).send('Unable to remove category / Category not found');
+        });
+});
+app.get('/items/delete/:id', (req, res) => {
+    storeService.deleteItemById(req.params.id)
+        .then(() => res.redirect('/items'))
+        .catch((err) => {
+            console.error('Unable to remove item:', err);
+            res.status(500).send('Unable to remove item / Item not found');
+        });
 });
 
 
-app.get('/items/add', (req, res) => res.render('addItem', { title: 'Add Item' }));
+
+// Route for adding a new item
+app.get('/items/add', (req, res) => {
+    // Fetch categories from the database
+    storeService.getAllCategories()
+        .then((categories) => {
+            res.render('addItem', { title: 'Add Item', categories: categories });
+        })
+        .catch((err) => {
+            console.error('Error fetching categories:', err);
+            res.render('addItem', { title: 'Add Item', categories: [] });
+        });
+});
+
 
 
 app.use((req, res) => res.status(404).render('error', { title: 'Page Not Found' }));
@@ -197,14 +245,9 @@ app.use((req, res) => res.status(404).render('error', { title: 'Page Not Found' 
 
 app.post('/items/add', upload.single('featureImage'), (req, res) => {
     const processItem = (imageUrl) => {
-      
         req.body.featureImage = imageUrl;
-        const currentDate = new Date();
-        req.body.itemDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-
-   
-        storeService.addItem(req.body)
-            .then(() => res.redirect('/shop'))
+        storeService.addItem(req.body)  
+            .then(() => res.redirect('/items'))
             .catch((err) => {
                 console.error('Failed to add item:', err);
                 res.status(500).send('Failed to add item');
@@ -229,6 +272,15 @@ app.post('/items/add', upload.single('featureImage'), (req, res) => {
     } else {
         processItem('');
     }
+});
+
+
+app.get('/shop/delete/:id', (req, res) => {
+    storeService.deleteItemById(req.params.id)
+        .then(() => res.redirect('/shop'))  // Redirect back to the shop page after deletion
+        .catch((err) => {
+            res.status(500).send('Unable to Remove Item: ' + err);  // Return error message if deletion fails
+        });
 });
 
 
