@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,13 +11,13 @@
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top bg-dark navbar-dark">
     <div class="container d-flex justify-content-center">
       <div class="row">
         <div class="col-12 d-flex justify-content-center mb-3">
           <span class="navbar-brand mb-0 h1">
-            <h1>Web322 – Assignment 5 - Rickson Bozar</h1>
+            <h1>Web322 – Assignment 6 - Rickson Bozar</h1>
           </span>
         </div>
         <div class="col-12 d-flex justify-content-center">
@@ -28,27 +27,51 @@
               {{#navLink "/shop"}}Shop{{/navLink}}
               {{#navLink "/items"}}Items{{/navLink}}
               {{#navLink "/categories"}}Categories{{/navLink}}
-            
             </ul>
+
+            <!-- Conditional Rendering for Session -->
+            {{#if session.user}}
+            <!-- User Logged In -->
+            <form class="navbar-form navbar-right">
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
+                  <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{session.user.userName}}&nbsp;&nbsp;<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="userMenu">
+                  <li><a class="dropdown-item" href="/userHistory">User History</a></li>
+                  <li><a class="dropdown-item" href="/logout">Log Out</a></li>
+                </ul>
+              </div>
+            </form>
+            {{else}}
+            <!-- User Not Logged In -->
+            <form class="navbar-form navbar-right">
+              <a href="/register" class="btn btn-success">
+                <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;Register
+              </a>
+              <a href="/login" class="btn btn-primary">
+                <span class="glyphicon glyphicon-chevron-right"></span>&nbsp;&nbsp;Log In
+              </a>
+            </form>
+            {{/if}}
           </div>
-        </div>   
+        </div>
       </div>
     </div>
   </nav>
 
-
+  <!-- Main Content -->
   <div class="container" style="padding-top: 170px;">
-    {{{body}}} 
+    {{{body}}}
   </div>
 
- 
+  <!-- Footer -->
   <footer class="bg-dark text-center text-white py-3 mt-4">
     <div class="container">
       <p>&copy; 2024 Rickson Bozar. All Rights Reserved.</p>
     </div>
   </footer>
 
- 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
