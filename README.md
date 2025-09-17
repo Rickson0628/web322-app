@@ -44,6 +44,43 @@
 
 ---
 
+## 📌 Features You Learned & Implemented
+
+### 🔧 Backend Development (Express.js)
+- Built routes (`/about`, `/shop`, `/items`, `/categories`, `/register`, `/login`, etc.)  
+- Middleware for request parsing and session management  
+
+### 🔑 Authentication System
+- User registration with password hashing (**bcrypt**)  
+- User login with validation and login history tracking (**MongoDB**)  
+- Session handling with **client-sessions**  
+- Protecting routes with middleware (`ensureLogin`)  
+
+### 🗂️ Database Operations
+- **PostgreSQL + Sequelize** → Add, delete, and query items/categories  
+- **MongoDB + Mongoose** → Manage users and authentication  
+- Implemented **CRUD operations** across both databases  
+
+### 🖼️ File Upload & Image Management
+- Upload images via **Multer**  
+- Store and serve images from **Cloudinary**  
+
+### 🎨 Dynamic Templates with Handlebars
+- Custom helpers (`navLink`, `equal`, `safeHTML`, `formatDate`)  
+- Conditional rendering (`if session.user → show login/register or user dropdown`)  
+- Shared layout (`main.hbs`)  
+
+### 💻 Frontend with Bootstrap
+- Responsive navigation bar with login/register or user dropdown  
+- Tables and forms for managing categories, items, and user data  
+
+### 🔒 Security Best Practices
+- Sanitizing input with **strip-js**  
+- Password hashing with **bcrypt**  
+- Sessions managed securely with **client-sessions**  
+
+---
+
 ## 🚀 Hosting / Deployment
 - **Vercel** → Deployed frontend + backend app  
 - **GitHub** → Version control and project repository  
